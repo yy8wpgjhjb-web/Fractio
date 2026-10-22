@@ -45,9 +45,9 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)
 .stage[data-m=fill] #fillo{display:block}
 .label{font-weight:900;letter-spacing:.04em;font-size:min(9vw,7vh);line-height:1.05;max-width:100%}
 .sub{font-size:min(5vw,3vh);font-weight:600;opacity:.85;min-height:1.3em}
-.gw{position:relative;width:min(76vw,40vh);aspect-ratio:1}
-.stage[data-m=bar] .gw{width:min(88vw,640px);aspect-ratio:auto;height:36px}
-.gw svg{width:100%;height:100%;display:block}
+.gw{position:relative;flex:none;width:min(76vw,40vh);height:min(76vw,40vh)}
+.stage[data-m=bar] .gw{width:min(88vw,640px);height:36px}
+.gw svg{width:100%;height:100%;display:block;aspect-ratio:1}
 .trk{fill:none;stroke:var(--trk);stroke-width:7}
 .pietrk{fill:var(--trk)}
 .arc{fill:none;stroke:var(--fg);stroke-width:7;stroke-linecap:round}
@@ -147,7 +147,7 @@ html[data-theme=glass] :is(.card,.box,.seg){background:rgba(255,255,255,.09);bor
 html[data-theme=glass] nav{background:rgba(20,26,45,.45);border-radius:26px 26px 0 0}
 html[data-theme=glass] .top{margin:6px 14px 8px;border-radius:22px;padding:8px 16px}
 html[data-theme=glass] .label{padding:.1em .6em;border-radius:999px}
-html[data-theme=glass] .gw{border-radius:50%;padding:3%}
+html[data-theme=glass] .gw{border-radius:50%;padding:3%;box-sizing:border-box}
 html[data-theme=glass] .stage[data-m=bar] .gw{border-radius:24px;padding:5px}
 html[data-theme=glass] .stage[data-m=ring] .gw svg{padding:0}
 html[data-theme=glass] .stage:not([data-m=ring]) .digits{padding:.05em .28em;border-radius:.3em}
@@ -232,8 +232,8 @@ html[data-theme=piscine] :is(.card,.box){border:1px solid var(--line)}
   .stage{container-type:size}
   .label{font-size:min(9cqw,7cqh)}
   .sub{font-size:min(5cqw,3.6cqh)}
-  .gw{width:min(76cqw,46cqh)}
-  .stage[data-m=bar] .gw{width:min(88cqw,640px)}
+  .gw{width:min(76cqw,46cqh);height:min(76cqw,46cqh)}
+  .stage[data-m=bar] .gw{width:min(88cqw,640px);height:36px}
   .digits{font-size:min(16cqw,10cqh)}
   .stage[data-m=digital] .digits,.stage[data-m=fill] .digits{font-size:min(31cqw,26cqh)}
   .stage[data-m=digital] .digits.long,.stage[data-m=fill] .digits.long{font-size:min(21cqw,18cqh)}
@@ -327,7 +327,7 @@ function build(p,s){
 function notes(id){
   const strike=(t,f,d,g)=>[{t,d,f,g},{t,d:d*.7,f:f*2.76,g:g*.35}];
   switch(id){
-    case 'click':return [{t:0,d:.025,w:'noise',g:.3},{t:0,d:.16,f:1500,g:.6,k:3},{t:0,d:.09,f:2400,g:.25,k:4}];
+    case 'click':return [{t:0,d:.03,w:'noise',g:.5},{t:0,d:.2,f:1500,g:.95,k:2.5},{t:0,d:.12,f:2400,g:.4,k:3.5}];
     case 'beep':return [{t:0,d:.25,f:880,g:.7,k:2.5},{t:0,d:.12,f:1760,g:.2,k:4}];
     case 'high':return [{t:0,d:.2,f:1760,g:.9,k:2.5}];
     case 'wood':return [{t:0,d:.15,f:900,f2:600,w:'tri',g:.85,k:4},{t:0,d:.03,w:'noise',g:.3}];
@@ -364,7 +364,7 @@ function mix(out,rate,t0,list,vol){
     }
   }
 }
-const DRIVE=2.6;
+const DRIVE=4.6;
 function renderWav(items,len,rate,vol){
   const n=Math.ceil(len*rate),b=new ArrayBuffer(44+n*2),v=new DataView(b);
   const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
@@ -750,7 +750,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 10')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 11')
   );
 }
 function exportData(){
