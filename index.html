@@ -354,14 +354,23 @@ let P=store.get('presets',null);if(!Array.isArray(P)||!P.length){P=defaultPreset
 const saveS=()=>store.set('settings',S),saveP=()=>store.set('presets',P);
 
 /* ---------- moteur ---------- */
-const R={tl:null,preset:null,run:false,fin:false,acc:0,t0:0,audio:new Audio(),url:null,audioReady:false,lastIdx:-1,raf:0,wl:null,lastRun:null};
+const R={tl:null,preset:null,run:false,fin:false,acc:0,t0:0,audio:new Audio(),url:null,audioReady:false,lastIdx:-1,raf:0,wl:null,lastRun:null,playAt:0,lastSync:0};
 R.audio.preload='auto';R.audio.setAttribute('playsinline','');
 
 function elapsed(){
-  if(!R.run)return R.acc;
-  let e=R.acc+(Date.now()-R.t0)/1000;const a=R.audio;
-  if(!a.paused&&a.readyState>=3&&!a.seeking&&!a.ended){const d=a.currentTime-e;if(Math.abs(d)>.12){R.t0-=d*1000;e=a.currentTime;}}
-  return e;
+  // l'horloge de l'écran ne dépend JAMAIS du lecteur audio : elle ne peut pas se figer
+  return R.run?R.acc+(Date.now()-R.t0)/1000:R.acc;
+}
+// c'est l'audio qui se recale sur l'horloge (jamais l'inverse)
+function syncAudio(e){
+  const a=R.audio,now=Date.now();
+  if(!R.run||!R.audioReady||now-R.playAt<1800||now-R.lastSync<400||R.fin)return;
+  R.lastSync=now;
+  try{
+    if(e>=R.tl.total-.3||a.seeking)return;
+    if(a.paused){a.currentTime=e;const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{});}
+    else if(a.readyState>=2&&Math.abs(a.currentTime-e)>.45)a.currentTime=e;
+  }catch(err){}
 }
 function loadPreset(p){
   R.preset=p;R.tl=build(p,S);R.acc=0;R.run=false;R.fin=false;R.lastIdx=-1;R.audioReady=false;
@@ -384,7 +393,7 @@ function play(){
     if(R.acc>0){const sk=R.acc;a.addEventListener('loadedmetadata',()=>{try{a.currentTime=sk;}catch(e){}},{once:true});}
   }else{try{a.currentTime=R.acc;}catch(e){}}
   const pr=a.play();if(pr&&pr.catch)pr.catch(()=>toast('Son bloqué par iOS : touchez ▶ de nouveau'));
-  R.run=true;R.t0=Date.now();
+  R.run=true;R.t0=Date.now();R.playAt=R.t0;
   if(R.acc<.5){const g=R.tl.segs[0];R.lastIdx=0;announce(g);}
   wake(true);mediaSess();syncBtns();startLoop();
 }
@@ -419,7 +428,7 @@ function announce(g){
 function speak(t){
   try{const u=new SpeechSynthesisUtterance(t);u.lang='fr-FR';u.volume=S.volume;
     const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('fr'));if(v)u.voice=v;
-    speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),250);}catch(e){}
+    speechSynthesis.cancel();setTimeout(()=>speechSynthesis.speak(u),550);}catch(e){}
 }
 async function wake(on){
   try{
@@ -476,6 +485,7 @@ function update(){
   const tl=R.tl;if(!tl||!tl.segs.length)return;
   let e=Math.min(elapsed(),tl.total);
   if(R.run&&e>=tl.total-.001){finish();e=tl.total;}
+  syncAudio(e);
   const i=curIdx(e),g=tl.segs[i],T=$('#timer');
   if(i!==R.lastIdx){const first=R.lastIdx===-1;R.lastIdx=i;if(!first&&R.run&&e-g.start<1.5)announce(g);}
   let bg,label,sub,rem,f,nx,nbg;
@@ -665,7 +675,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 5')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 6')
   );
 }
 function exportData(){
