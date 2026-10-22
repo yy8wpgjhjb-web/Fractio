@@ -82,9 +82,11 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)
 .box{background:var(--card);border-radius:14px;padding:12px 14px;margin:12px 0}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
-.rl{flex:1;min-width:0}
+.rl{flex:1 1 0;min-width:min-content;overflow-wrap:normal}
 .rl small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
-.ctl{display:flex;align-items:center;gap:8px}
+.ctl{display:flex;align-items:center;gap:8px;flex:0 1 62%;min-width:0}
+.ctl select{flex:1 1 auto;min-width:0;width:100%;text-overflow:ellipsis}
+.row>select{flex:0 1 62%;min-width:0;width:62%}
 .inp{background:var(--inp);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:16px;min-width:0;max-width:100%}
 .inp.n{width:62px;text-align:center}
 .inp.full{width:100%}
@@ -726,7 +728,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 8')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 9')
   );
 }
 function exportData(){
