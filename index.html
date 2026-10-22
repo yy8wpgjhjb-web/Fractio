@@ -176,6 +176,52 @@ html[data-theme=piste] .strip{border-color:#fff;border-width:3px}
 html[data-theme=piste] .next{border-radius:10px;border-color:#fff;border-width:3px}
 html[data-theme=piste] h1,html[data-theme=piste] .ct{font-style:italic;font-weight:900}
 html[data-theme=piste] nav{border-top:8px solid #fff}
+
+/* --- Liquid Glass : menu du bas lisible --- */
+html[data-theme=glass] nav{background:rgba(8,14,34,.66)}
+html[data-theme=glass] nav button{color:rgba(255,255,255,.92);font-weight:700;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.65);margin:6px 4px 4px;padding:6px 0 5px;border-radius:18px;border:1px solid transparent}
+html[data-theme=glass] nav button svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+html[data-theme=glass] nav button.on{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);color:#fff}
+
+/* --- Stade (terrain de foot) --- */
+html[data-theme=stade]{--ff:"Avenir Next Condensed","Arial Narrow","Helvetica Neue",sans-serif;--fd:"Avenir Next Condensed","Arial Narrow",Impact,sans-serif;--bg:#0b2412;--card:#14391f;--line:#2f6a41;--inp:#1b4a29;--acc:#4ade80}
+html[data-theme=stade] body{font-weight:700}
+html[data-theme=stade] h1,html[data-theme=stade] h2,html[data-theme=stade] .ct{text-transform:uppercase;letter-spacing:.07em}
+html[data-theme=stade] #timer::before{content:"";position:absolute;inset:0;z-index:0;background:
+  radial-gradient(circle at 50% 46%,transparent min(36vw,19vh),var(--fg) calc(min(36vw,19vh) + 1px),var(--fg) calc(min(36vw,19vh) + 4px),transparent calc(min(36vw,19vh) + 5px)),
+  linear-gradient(var(--fg),var(--fg)) 0 46%/100% 3px no-repeat,
+  repeating-linear-gradient(0deg,rgba(255,255,255,.09) 0 56px,rgba(0,0,0,.1) 56px 112px);opacity:.28}
+html[data-theme=stade] #timer::after{content:"";position:absolute;inset:10px;z-index:2;border:3px solid var(--fg);opacity:.45;border-radius:4px}
+html[data-theme=stade] .label{text-transform:uppercase;letter-spacing:.08em;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+html[data-theme=stade] .digits{font-weight:700;text-shadow:0 5px 0 rgba(0,0,0,.22)}
+html[data-theme=stade] .strip{border-radius:4px;border-width:3px;margin-top:4px}
+html[data-theme=stade] .top{padding-left:24px;padding-right:24px}
+html[data-theme=stade] .next{border-radius:8px;border-width:3px;text-transform:uppercase;letter-spacing:.06em;transform:rotate(-1.5deg);box-shadow:3px 4px 0 rgba(0,0,0,.35)}
+html[data-theme=stade] .cb{border-radius:50%;border:3px solid var(--fg)}
+html[data-theme=stade] .card{border-left:6px solid var(--acc)}
+html[data-theme=stade] nav{background:#08190d;border-top:3px solid #fff}
+html[data-theme=stade] nav button{color:#cfe8d6}
+html[data-theme=stade] nav button.on{color:#fff}
+
+/* --- Piscine --- */
+@keyframes ripple{0%{background-position:0 0,40px 30px,0 0}100%{background-position:160px 90px,-120px 110px,0 0}}
+html[data-theme=piscine]{--ff:"Avenir Next","Helvetica Neue",sans-serif;--fd:ui-rounded,"SF Pro Rounded","Avenir Next",sans-serif;--bg:#04202b;--card:#0a3445;--line:#17607a;--inp:#0f4258;--acc:#22d3ee}
+html[data-theme=piscine] #timer::before{content:"";position:absolute;inset:-4%;z-index:0;background:
+  radial-gradient(ellipse 60px 28px at 50% 50%,rgba(255,255,255,.24),transparent 70%) 0 0/110px 70px,
+  radial-gradient(ellipse 80px 34px at 50% 50%,rgba(255,255,255,.17),transparent 70%) 0 0/150px 95px,
+  linear-gradient(180deg,rgba(255,255,255,.13),transparent 35%,rgba(0,0,0,.2));animation:ripple 14s linear infinite}
+html[data-theme=piscine] #timer::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:repeating-linear-gradient(0deg,#ef4444 0 14px,#fff 14px 28px);
+  -webkit-mask-image:linear-gradient(90deg,transparent 3px,#000 3px 11px,transparent 11px calc(100% - 11px),#000 calc(100% - 11px) calc(100% - 3px),transparent calc(100% - 3px));mask-image:linear-gradient(90deg,transparent 3px,#000 3px 11px,transparent 11px calc(100% - 11px),#000 calc(100% - 11px) calc(100% - 3px),transparent calc(100% - 3px));opacity:.85;border-radius:0}
+html[data-theme=piscine] .label{letter-spacing:.06em;text-shadow:0 2px 10px rgba(0,40,70,.35)}
+html[data-theme=piscine] .digits{text-shadow:0 4px 14px rgba(0,40,70,.35)}
+html[data-theme=piscine] .strip{border-width:3px}
+html[data-theme=piscine] .next{border-radius:999px;border-width:3px;box-shadow:0 6px 18px rgba(0,30,60,.35)}
+html[data-theme=piscine] .cb{border-radius:50%;box-shadow:0 5px 14px rgba(0,30,60,.35)}
+html[data-theme=piscine] nav{background:#041a24;border-top:3px solid #22d3ee}
+html[data-theme=piscine] nav button{color:#bfe7f2}
+html[data-theme=piscine] nav button.on{color:#fff}
+html[data-theme=piscine] :is(.card,.box){border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -223,9 +269,9 @@ const TYPE_OPTS={warmup:'Échauffement',work:'Exercice',rest:'Repos',recovery:'R
 const TICKS={click:'Clic de bombe',beep:'Bip',high:'Bip aigu',wood:'Bloc de bois',drop:'Goutte',none:'Aucun'};
 const CHANGES={dbl:'Double bip',triple:'Triple montant',up:'Deux notes montantes',down:'Deux notes descendantes',whistle:'Sifflet',horn:'Klaxon',bell:'Cloche de ring (×3)',gong:'Gong',chime:'Carillon',siren:'Sirène',none:'Aucun'};
 const DEF={
-  volume:.8,tick:'click',countdown:3,
+  volume:1,tick:'click',countdown:3,
   snd:{prep:'dbl',warmup:'up',work:'whistle',rest:'down',recovery:'chime',end:'gong'},
-  voice:true,prepTime:5,display:'ring',theme:'classic',ver:5,
+  voice:true,prepTime:5,display:'ring',theme:'classic',ver:8,
   colors:{prep:'#64748b',warmup:'#f59e0b',work:'#16a34a',rest:'#dc2626',recovery:'#2563eb'},
   wake:true,last:null
 };
@@ -292,18 +338,21 @@ function mix(out,rate,t0,list,vol){
       else s=Math.sin(ph);
       if(n.trem)s*=.6+.4*Math.sin(2*Math.PI*n.trem*tt);
       const env=n.e==='s'?Math.min(1,tt/.02,(len-i)/rate/.04):Math.min(1,tt/.003)*Math.exp(-(n.k||5)*x);
-      const v=out[j]+s*env*g;
-      out[j]=v>32767?32767:v<-32768?-32768:v;
+      out[j]+=s*env*g;
     }
   }
 }
+const DRIVE=2.6;
 function renderWav(items,len,rate,vol){
   const n=Math.ceil(len*rate),b=new ArrayBuffer(44+n*2),v=new DataView(b);
   const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
   w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
   v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
-  const out=new Int16Array(b,44,n);
-  for(const it of items)mix(out,rate,it.at,it.notes,vol);
+  const out=new Int16Array(b,44,n),f=new Float32Array(n);
+  for(const it of items)mix(f,rate,it.at,it.notes,1);
+  // gain général + limiteur doux (tanh) : le son est beaucoup plus fort sans saturer brutalement
+  const G=vol*DRIVE;
+  for(let i=0;i<n;i++){const x=f[i];if(x)out[i]=Math.round(Math.tanh(x/32767*G)*32500);}
   return {blob:new Blob([b],{type:'audio/wav'}),samples:out,rate};
 }
 function sessionAudio(tl,s){
@@ -349,7 +398,9 @@ const newPreset=()=>({id:uid(),name:'Nouvelle séance',mode:'cycles',warmup:300,
   segs:[{type:'warmup',dur:300,label:''},{type:'work',dur:60,label:''},{type:'rest',dur:30,label:''},{type:'recovery',dur:300,label:''}]});
 let S=Object.assign(cl(DEF),store.get('settings',{}));
 S.snd=Object.assign({},DEF.snd,S.snd);S.colors=Object.assign({},DEF.colors,S.colors);
-if(!S.ver||S.ver<5){S.tick='beep';S.countdown=3;S.ver=5;}
+if(!S.ver||S.ver<5){S.tick='beep';S.countdown=3;}
+if(!S.ver||S.ver<8){S.volume=1;}
+S.ver=8;
 let P=store.get('presets',null);if(!Array.isArray(P)||!P.length){P=defaultPresets();store.set('presets',P);}
 const saveS=()=>store.set('settings',S),saveP=()=>store.set('presets',P);
 
@@ -456,8 +507,8 @@ function drawStrip(){
   if(R.tl)for(const g of R.tl.segs)st.append(el('i',{style:`flex:${g.dur};background:${S.colors[g.type]}`}));
   st.append(el('div',{id:'mask'}));
 }
-const THEMES={classic:'Classique',hangar:'Hangar de combat',glass:'Liquid Glass',led:'Tableau LED',piste:'Piste d’athlétisme'};
-const THEME_HINT={classic:'Sobre et lisible.',hangar:'Béton, bandes de chantier, police massive : l’ambiance salle de combat.',glass:'Panneaux de verre dépoli et reflets colorés qui dérivent doucement.',led:'Afficheur de stade à points lumineux ; la couleur de période devient la couleur des LED.',piste:'Couloirs blancs, italique de sprinter et ligne d’arrivée à damier.'};
+const THEMES={classic:'Classique',hangar:'Hangar de combat',glass:'Liquid Glass',led:'Tableau LED',piste:'Piste d’athlétisme',stade:'Stade de foot',piscine:'Piscine'};
+const THEME_HINT={classic:'Sobre et lisible.',hangar:'Béton, bandes de chantier, police massive : l’ambiance salle de combat.',glass:'Panneaux de verre dépoli et reflets colorés qui dérivent doucement.',led:'Afficheur de stade à points lumineux ; la couleur de période devient la couleur des LED.',piste:'Couloirs blancs, italique de sprinter et ligne d’arrivée à damier.',stade:'Pelouse tondue en bandes, lignes de touche et rond central tracés dans la couleur de la période, « Ensuite » façon carton.',piscine:'Eau qui ondule, lignes d’eau rouges et blanches, boutons ronds comme des bouées.'};
 const mixc=(a,b,t)=>{const x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);const c=sh=>Math.round((x>>sh&255)*(1-t)+(y>>sh&255)*t);return '#'+[16,8,0].map(sh=>c(sh).toString(16).padStart(2,'0')).join('');};
 function applyTheme(){document.documentElement.dataset.theme=THEMES[S.theme]?S.theme:'classic';}
 const MODES={digital:'Numérique',ring:'Anneau',pie:'Secteur',analog:'Horloge',bar:'Barre',fill:'Remplissage'};
@@ -657,7 +708,7 @@ function drawSet(){
   for(const k in MODES)chips.append(el('button',{class:'chip '+(S.display===k?'on':''),onclick:()=>{S.display=k;saveS();setMode();update();drawSet();}},MODES[k]));
   r.replaceChildren(el('h1',{},'Réglages'),
     box('Son',
-      el('div',{class:'rl'},'Volume'),vol,
+      el('div',{class:'rl'},'Volume (100 % = très fort)'),vol,
       row('Son du décompte',el('span',{class:'ctl'},sel(TICKS,S.tick,v=>{S.tick=v;saveS();dirty();preview(v);}),el('button',{class:'btn sm',onclick:previewTicks},'▶ ×3'))),
       row('Décompte',sel({0:'Aucun',3:'3 dernières secondes',5:'5 dernières secondes',10:'10 dernières secondes',99:'Chaque seconde'},S.countdown,v=>{S.countdown=+v;saveS();dirty();}))),
     box('Sons de changement de période',
@@ -675,7 +726,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 6')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 8')
   );
 }
 function exportData(){
