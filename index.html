@@ -298,7 +298,7 @@ const CHANGES={dbl:'Double bip',triple:'Triple montant',up:'Deux notes montantes
 const DEF={
   volume:1,tick:'click',countdown:3,
   snd:{prep:'dbl',warmup:'up',work:'whistle',rest:'down',recovery:'chime',end:'gong'},
-  voice:true,mix:false,autolock:false,prepTime:5,display:'ring',theme:'classic',ver:8,
+  voice:true,autolock:false,prepTime:5,display:'ring',theme:'classic',ver:8,
   colors:{prep:'#64748b',warmup:'#f59e0b',work:'#16a34a',rest:'#dc2626',recovery:'#2563eb'},
   wake:true,last:null
 };
@@ -467,7 +467,7 @@ function play(){
   if(!R.tl||!R.tl.total){toast('Séance vide');return;}
   if(R.fin)resetRun();
   if(R.run)return;
-  purgeForms();applyAudioSession();
+  purgeForms();
   const a=R.audio;
   if(!R.audioReady){
     const {blob}=sessionAudio(R.tl,S);
@@ -521,7 +521,7 @@ async function wake(on){
   }catch(e){}
 }
 function mediaSess(){
-  if(!('mediaSession' in navigator)||S.mix)return;
+  if(!('mediaSession' in navigator))return;
   try{
     navigator.mediaSession.metadata=new MediaMetadata({title:R.preset?R.preset.name:'Fractio',artist:'Fractio'});
     navigator.mediaSession.setActionHandler('play',play);
@@ -634,9 +634,6 @@ function purgeForms(){
   try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur();}catch(e){}
   $('#lib').replaceChildren();$('#set').replaceChildren();$('#editor').replaceChildren();
 }
-/* ---------- session audio : jouer par-dessus la musique ---------- */
-function applyAudioSession(){try{if('audioSession' in navigator)navigator.audioSession.type=S.mix?'ambient':'auto';}catch(e){}}
-
 /* ---------- navigation ---------- */
 function show(v){
   for(const x of ['timer','lib','set'])$('#'+x).classList.toggle('on',x===v);
@@ -772,9 +769,7 @@ function drawSet(){
     box('Son',
       el('div',{class:'rl'},'Volume (100 % = très fort)'),vol,
       row('Son du décompte',el('span',{class:'ctl'},sel(TICKS,S.tick,v=>{S.tick=v;saveS();dirty();preview(v);}),el('button',{class:'btn sm',onclick:previewTicks},'▶ ×3'))),
-      row('Décompte',sel({0:'Aucun',3:'3 dernières secondes',5:'5 dernières secondes',10:'10 dernières secondes',99:'Chaque seconde'},S.countdown,v=>{S.countdown=+v;saveS();dirty();})),
-      row('Jouer par-dessus ma musique',tog(S.mix,v=>{S.mix=v;saveS();applyAudioSession();}),'Apple Music, Spotify…'),
-      el('div',{class:'hint'},('audioSession' in navigator)?'Désactivé : la séance prend le contrôle du son et met ta musique en pause. Activé : la musique continue et les bips se mélangent. Attention, dans ce mode le commutateur silencieux de l’iPhone coupe les bips, et ils peuvent s’arrêter écran verrouillé : garde l’écran allumé.':'Cette option demande iOS 17 ou plus récent ; elle n’est pas disponible ici.')),
+      row('Décompte',sel({0:'Aucun',3:'3 dernières secondes',5:'5 dernières secondes',10:'10 dernières secondes',99:'Chaque seconde'},S.countdown,v=>{S.countdown=+v;saveS();dirty();}))),
     box('Sons de changement de période',
       snd('Préparation','prep',CHANGES),snd('Échauffement','warmup',CHANGES),snd('Exercice','work',CHANGES),snd('Repos','rest',CHANGES),snd('Récupération','recovery',CHANGES),snd('Fin de séance','end',CHANGES),
       el('div',{class:'hint'},'Les sons sont intégrés à la séance au démarrage : ils continuent écran verrouillé. Un changement s’applique à la prochaine séance lancée ou réinitialisée.')),
@@ -793,7 +788,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 14')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 15')
   );
 }
 function exportData(){
@@ -826,7 +821,7 @@ function importData(ev){
 
 /* ---------- démarrage ---------- */
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-applyTheme();applyAudioSession();
+applyTheme();
 loadPreset(P.find(p=>p.id===S.last)||P[0]);
 </script>
 </body>
