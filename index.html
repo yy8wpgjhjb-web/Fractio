@@ -63,10 +63,10 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)
 .stage[data-m=ring] .digits{position:absolute;inset:0;display:grid;place-items:center;font-size:min(18vw,11vh)}
 .stage[data-m=ring] .digits.long{font-size:min(13vw,8vh)}
 .next{font-size:min(4.6vw,2.8vh);font-weight:700;padding:.55em 1.1em;border-radius:14px;border:2.5px solid var(--fg,transparent);background:var(--nbg,#374151);color:var(--ntx,#fff);transition:background .25s}
-.ctrl{display:flex;justify-content:center;align-items:center;gap:20px;padding:10px 0 18px}
-.cb{width:58px;height:58px;border-radius:50%;border:0;background:var(--ov2);color:var(--fg);display:grid;place-items:center;padding:0}
+.ctrl{display:flex;justify-content:center;align-items:center;gap:min(14px,2.6vw);padding:10px 0 18px}
+.cb{flex:none;width:min(52px,12.4vw);height:min(52px,12.4vw);border-radius:50%;border:0;background:var(--ov2);color:var(--fg);display:grid;place-items:center;padding:0}
 .cb svg{width:26px;height:26px}
-.cb.big{width:88px;height:88px;background:var(--fg);color:var(--tbg)}
+.cb.big{width:min(88px,21vw);height:min(88px,21vw);background:var(--fg);color:var(--tbg)}
 .cb.big svg{width:40px;height:40px}
 .cb:active{transform:scale(.94)}
 
@@ -109,6 +109,12 @@ input[type=color]{width:46px;height:34px;border:0;padding:0;background:none}
 .seg{background:var(--inp);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-left:8px solid var(--c,#888)}
 .seg .inp.full{flex:1 1 100%}
 .hint{color:var(--mut);font-size:13px;margin:6px 0}
+#lock{position:fixed;inset:0;z-index:40;display:none;touch-action:none;-webkit-user-select:none;user-select:none}
+#lock.on{display:block}
+#lock .hold{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 6px);transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:16px 24px;border-radius:40px;background:rgba(0,0,0,.62);color:#fff;font-weight:700;overflow:hidden;white-space:nowrap;border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);touch-action:none}
+#lock .hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.38)}
+#lock .hold>*:not(.fill){position:relative}
+#lock .hold svg{width:22px;height:22px}
 #toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:20px;z-index:50;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s;max-width:88vw;text-align:center}
 #toast.on{opacity:1}
 
@@ -130,7 +136,7 @@ html[data-theme=hangar] .digits{font-weight:400;text-shadow:5px 5px 0 rgba(0,0,0
 html[data-theme=hangar] .strip{border-radius:2px;border-width:3px}
 html[data-theme=hangar] .next{border-radius:2px;border-width:3px;text-transform:uppercase;letter-spacing:.05em;box-shadow:5px 5px 0 rgba(0,0,0,.45)}
 html[data-theme=hangar] .cb{border-radius:6px;border:3px solid var(--fg)}
-html[data-theme=hangar] .cb.big{border-radius:6px;width:98px}
+html[data-theme=hangar] .cb.big{border-radius:6px;width:min(98px,23vw)}
 html[data-theme=hangar] :is(.btn,.card,.box,.inp,.chip,.seg){border-radius:3px}
 html[data-theme=hangar] .card{border-left:7px solid var(--acc)}
 html[data-theme=hangar] .chip{border-radius:3px;text-transform:uppercase}
@@ -261,6 +267,7 @@ html[data-theme=piscine] :is(.card,.box){border:1px solid var(--line)}
       <button class="cb" id="bPrev" aria-label="Période précédente"></button>
       <button class="cb big" id="bPlay" aria-label="Démarrer / pause"></button>
       <button class="cb" id="bNext" aria-label="Période suivante"></button>
+      <button class="cb" id="bLock" aria-label="Verrouiller l’écran tactile"></button>
     </div>
   </section>
   <section id="lib" class="view scroll"></section>
@@ -272,6 +279,7 @@ html[data-theme=piscine] :is(.card,.box){border:1px solid var(--line)}
   </nav>
 </div>
 <div id="editor" class="ov"></div>
+<div id="lock"><div class="hold" id="hold"><span class="fill" id="holdfill"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Maintiens 2 s pour déverrouiller</span></div></div>
 <div id="toast"></div>
 
 <script>
@@ -290,7 +298,7 @@ const CHANGES={dbl:'Double bip',triple:'Triple montant',up:'Deux notes montantes
 const DEF={
   volume:1,tick:'click',countdown:3,
   snd:{prep:'dbl',warmup:'up',work:'whistle',rest:'down',recovery:'chime',end:'gong'},
-  voice:true,prepTime:5,display:'ring',theme:'classic',ver:8,
+  voice:true,mix:false,autolock:false,prepTime:5,display:'ring',theme:'classic',ver:8,
   colors:{prep:'#64748b',warmup:'#f59e0b',work:'#16a34a',rest:'#dc2626',recovery:'#2563eb'},
   wake:true,last:null
 };
@@ -406,6 +414,7 @@ const IC={
   pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
   reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
   next:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6l9 6-9 6z"/><rect x="16" y="6" width="2.6" height="12" rx="1"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
   prev:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 6l-9 6 9 6z"/><rect x="5.4" y="6" width="2.6" height="12" rx="1"/></svg>'
 };
 
@@ -458,6 +467,7 @@ function play(){
   if(!R.tl||!R.tl.total){toast('Séance vide');return;}
   if(R.fin)resetRun();
   if(R.run)return;
+  purgeForms();applyAudioSession();
   const a=R.audio;
   if(!R.audioReady){
     const {blob}=sessionAudio(R.tl,S);
@@ -469,6 +479,7 @@ function play(){
   R.run=true;R.t0=Date.now();R.playAt=R.t0;
   if(R.acc<.5){const g=R.tl.segs[0];R.lastIdx=0;announce(g);}
   wake(true);mediaSess();syncBtns();startLoop();
+  clearTimeout(R.alt);if(S.autolock)R.alt=setTimeout(()=>{if(R.run&&!R.locked&&document.querySelector('#timer.on'))setLock(true);},3000);
 }
 function pause(){
   if(!R.run)return;
@@ -487,7 +498,7 @@ function curIdx(e){const s=R.tl.segs;for(let k=0;k<s.length;k++)if(e<s[k].start+
 function next(){if(!R.tl)return;const e=elapsed(),i=curIdx(e),s=R.tl.segs;if(R.fin)return;seek(i+1<s.length?s[i+1].start:R.tl.total);}
 function prev(){if(!R.tl)return;const e=elapsed(),i=curIdx(e),s=R.tl.segs;if(R.fin){seek(s[s.length-1].start);R.fin=false;return;}seek(e-s[i].start>2||i===0?s[i].start:s[i-1].start);}
 function finish(){
-  R.run=false;R.fin=true;R.acc=R.tl.total;wake(false);syncBtns();
+  setLock(false);R.run=false;R.fin=true;R.acc=R.tl.total;wake(false);syncBtns();
   if(S.voice&&!document.hidden)speak('Séance terminée');
 }
 function startLoop(){if(R.raf)return;R.raf=requestAnimationFrame(function f(){R.raf=0;update();if(R.run)R.raf=requestAnimationFrame(f);});}
@@ -510,7 +521,7 @@ async function wake(on){
   }catch(e){}
 }
 function mediaSess(){
-  if(!('mediaSession' in navigator))return;
+  if(!('mediaSession' in navigator)||S.mix)return;
   try{
     navigator.mediaSession.metadata=new MediaMetadata({title:R.preset?R.preset.name:'Fractio',artist:'Fractio'});
     navigator.mediaSession.setActionHandler('play',play);
@@ -593,11 +604,38 @@ function syncBtns(){
   if(R.lastRun!==R.run||R.lastRun===null){R.lastRun=R.run;$('#bPlay').innerHTML=R.run?IC.pause:IC.play;
     if('mediaSession' in navigator)try{navigator.mediaSession.playbackState=R.run?'playing':'paused';}catch(e){}}
 }
-$('#bReset').innerHTML=IC.reset;$('#bPrev').innerHTML=IC.prev;$('#bNext').innerHTML=IC.next;
+$('#bLock').innerHTML=IC.lock;$('#bReset').innerHTML=IC.reset;$('#bPrev').innerHTML=IC.prev;$('#bNext').innerHTML=IC.next;
 $('#bPlay').addEventListener('click',toggle);
 $('#bReset').addEventListener('click',resetRun);
 $('#bPrev').addEventListener('click',prev);
 $('#bNext').addEventListener('click',next);
+
+/* ---------- verrouillage tactile ---------- */
+let hold=null;
+function setLock(on){R.locked=on;$('#lock').classList.toggle('on',on);if(!on)holdStop();}
+function holdStart(e){e.preventDefault();holdStop();hold={t:Date.now(),raf:0};holdTick();}
+function holdTick(){
+  if(!hold)return;
+  const q=Math.min(1,(Date.now()-hold.t)/1500);$('#holdfill').style.width=(q*100)+'%';
+  if(q>=1){hold=null;$('#holdfill').style.width='0';setLock(false);toast('Écran déverrouillé');return;}
+  hold.raf=requestAnimationFrame(holdTick);
+}
+function holdStop(){if(hold)cancelAnimationFrame(hold.raf);hold=null;$('#holdfill').style.width='0';}
+(function(){
+  const h=$('#hold'),l=$('#lock');
+  h.addEventListener('pointerdown',holdStart);
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>h.addEventListener(t,holdStop));
+  ['touchstart','touchmove','touchend','contextmenu'].forEach(t=>l.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+  $('#bLock').addEventListener('click',()=>{setLock(true);toast('Écran verrouillé');});
+})();
+
+/* ---------- nettoyage des champs (évite « Annuler la saisie » quand on secoue l'iPhone) ---------- */
+function purgeForms(){
+  try{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur();}catch(e){}
+  $('#lib').replaceChildren();$('#set').replaceChildren();$('#editor').replaceChildren();
+}
+/* ---------- session audio : jouer par-dessus la musique ---------- */
+function applyAudioSession(){try{if('audioSession' in navigator)navigator.audioSession.type=S.mix?'ambient':'auto';}catch(e){}}
 
 /* ---------- navigation ---------- */
 function show(v){
@@ -605,7 +643,7 @@ function show(v){
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   if(v==='lib')drawLib();
   if(v==='set')drawSet();
-  if(v==='timer'){drawStrip();setMode();update();}
+  if(v==='timer'){purgeForms();drawStrip();setMode();update();}
 }
 document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
 
@@ -647,7 +685,7 @@ function drawLib(){
 }
 let ED=null;
 function openEditor(p,isNew){ED={p:cl(p),isNew};drawEditor();$('#editor').classList.add('on');$('#editor').scrollTop=0;}
-function closeEditor(){$('#editor').classList.remove('on');}
+function closeEditor(){$('#editor').classList.remove('on');try{document.activeElement&&document.activeElement.blur();}catch(e){}$('#editor').replaceChildren();}
 function stripEl(p){const tl=build(p,{prepTime:0});const s=el('div',{class:'strip',style:'margin:8px 0;background:#2a2e38'});for(const g of tl.segs)s.append(el('i',{style:`flex:${g.dur};background:${S.colors[g.type]}`}));return s;}
 function drawEditor(){
   const d=ED.p,root=$('#editor');
@@ -734,7 +772,9 @@ function drawSet(){
     box('Son',
       el('div',{class:'rl'},'Volume (100 % = très fort)'),vol,
       row('Son du décompte',el('span',{class:'ctl'},sel(TICKS,S.tick,v=>{S.tick=v;saveS();dirty();preview(v);}),el('button',{class:'btn sm',onclick:previewTicks},'▶ ×3'))),
-      row('Décompte',sel({0:'Aucun',3:'3 dernières secondes',5:'5 dernières secondes',10:'10 dernières secondes',99:'Chaque seconde'},S.countdown,v=>{S.countdown=+v;saveS();dirty();}))),
+      row('Décompte',sel({0:'Aucun',3:'3 dernières secondes',5:'5 dernières secondes',10:'10 dernières secondes',99:'Chaque seconde'},S.countdown,v=>{S.countdown=+v;saveS();dirty();})),
+      row('Jouer par-dessus ma musique',tog(S.mix,v=>{S.mix=v;saveS();applyAudioSession();}),'Apple Music, Spotify…'),
+      el('div',{class:'hint'},('audioSession' in navigator)?'Désactivé : la séance prend le contrôle du son et met ta musique en pause. Activé : la musique continue et les bips se mélangent. Attention, dans ce mode le commutateur silencieux de l’iPhone coupe les bips, et ils peuvent s’arrêter écran verrouillé : garde l’écran allumé.':'Cette option demande iOS 17 ou plus récent ; elle n’est pas disponible ici.')),
     box('Sons de changement de période',
       snd('Préparation','prep',CHANGES),snd('Échauffement','warmup',CHANGES),snd('Exercice','work',CHANGES),snd('Repos','rest',CHANGES),snd('Récupération','recovery',CHANGES),snd('Fin de séance','end',CHANGES),
       el('div',{class:'hint'},'Les sons sont intégrés à la séance au démarrage : ils continuent écran verrouillé. Un changement s’applique à la prochaine séance lancée ou réinitialisée.')),
@@ -745,12 +785,15 @@ function drawSet(){
     box('Thème',themeChips,el('div',{class:'hint'},THEME_HINT[S.theme]||'')),
     box('Apparence du compte à rebours',chips),
     box('Couleurs de fond',cols,el('button',{class:'btn sm',onclick:()=>{S.colors=cl(DEF.colors);saveS();drawSet();}},'Couleurs par défaut')),
+    box('Verrouillage tactile',
+      row('Verrouiller 3 s après le départ',tog(S.autolock,v=>{S.autolock=v;saveS();}),'Sinon, utilise le cadenas sous le chrono'),
+      el('div',{class:'hint'},'Écran verrouillé : tous les appuis sont ignorés. Pour déverrouiller, maintiens le bouton affiché en bas pendant 2 secondes. Les boutons de volume ne peuvent pas servir de raccourci : iOS ne les transmet pas aux applis web.')),
     box('Écran',row('Garder l’écran allumé',tog(S.wake,v=>{S.wake=v;saveS();wake(v&&R.run);}),'Pendant une séance')),
     box('Sauvegarde',
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 13')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 14')
   );
 }
 function exportData(){
@@ -783,7 +826,7 @@ function importData(ev){
 
 /* ---------- démarrage ---------- */
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-applyTheme();
+applyTheme();applyAudioSession();
 loadPreset(P.find(p=>p.id===S.last)||P[0]);
 </script>
 </body>
