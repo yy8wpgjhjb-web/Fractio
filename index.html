@@ -290,7 +290,7 @@ const CHANGES={dbl:'Double bip',triple:'Triple montant',up:'Deux notes montantes
 const DEF={
   volume:1,tick:'click',countdown:3,
   snd:{prep:'dbl',warmup:'up',work:'whistle',rest:'down',recovery:'chime',end:'gong'},
-  voice:true,vibe:true,prepTime:5,display:'ring',theme:'classic',ver:8,
+  voice:true,prepTime:5,display:'ring',theme:'classic',ver:8,
   colors:{prep:'#64748b',warmup:'#f59e0b',work:'#16a34a',rest:'#dc2626',recovery:'#2563eb'},
   wake:true,last:null
 };
@@ -467,7 +467,7 @@ function play(){
   }else{try{a.currentTime=R.acc;}catch(e){}}
   const pr=a.play();if(pr&&pr.catch)pr.catch(()=>toast('Son bloqué par iOS : touchez ▶ de nouveau'));
   R.run=true;R.t0=Date.now();R.playAt=R.t0;
-  if(R.acc<.5){const g=R.tl.segs[0];R.lastIdx=0;announce(g);buzz(g.type);}
+  if(R.acc<.5){const g=R.tl.segs[0];R.lastIdx=0;announce(g);}
   wake(true);mediaSess();syncBtns();startLoop();
 }
 function pause(){
@@ -488,30 +488,10 @@ function next(){if(!R.tl)return;const e=elapsed(),i=curIdx(e),s=R.tl.segs;if(R.f
 function prev(){if(!R.tl)return;const e=elapsed(),i=curIdx(e),s=R.tl.segs;if(R.fin){seek(s[s.length-1].start);R.fin=false;return;}seek(e-s[i].start>2||i===0?s[i].start:s[i-1].start);}
 function finish(){
   R.run=false;R.fin=true;R.acc=R.tl.total;wake(false);syncBtns();
-  buzz('end');
   if(S.voice&&!document.hidden)speak('Séance terminée');
 }
 function startLoop(){if(R.raf)return;R.raf=requestAnimationFrame(function f(){R.raf=0;update();if(R.run)R.raf=requestAnimationFrame(f);});}
 
-const VIB={work:[350],warmup:[250],recovery:[250],prep:[200],rest:[120,90,120],end:[400,120,400,120,400]};
-let hapt=null;
-function haptTick(){
-  try{
-    if(!hapt){
-      const l=document.createElement('label');l.setAttribute('aria-hidden','true');
-      l.style.cssText='position:fixed;left:-60px;top:-60px;width:40px;height:40px;opacity:.01;pointer-events:none';
-      const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');l.append(i);document.body.append(l);hapt={l,i};
-    }
-    hapt.l.click();
-  }catch(e){}
-}
-function buzz(kind){
-  if(!S.vibe)return;
-  const pat=VIB[kind]||[200];
-  try{if(navigator.vibrate&&navigator.vibrate(pat))return;}catch(e){}
-  // iPhone : pas d'API de vibration → retour haptique de Safari (une pulsation par segment)
-  let t=0;for(let k=0;k<pat.length;k+=2){setTimeout(haptTick,t);if(pat[k]>200)setTimeout(haptTick,t+110);t+=pat[k]+(pat[k+1]||0);}
-}
 function announce(g){
   if(!S.voice||document.hidden)return;
   let t=TYPES[g.type].say;
@@ -580,7 +560,7 @@ function update(){
   if(R.run&&e>=tl.total-.001){finish();e=tl.total;}
   syncAudio(e);
   const i=curIdx(e),g=tl.segs[i],T=$('#timer');
-  if(i!==R.lastIdx){const first=R.lastIdx===-1;R.lastIdx=i;if(!first&&R.run&&e-g.start<1.5){announce(g);buzz(g.type);}}
+  if(i!==R.lastIdx){const first=R.lastIdx===-1;R.lastIdx=i;if(!first&&R.run&&e-g.start<1.5)announce(g);}
   let bg,label,sub,rem,f,nx,nbg;
   if(R.fin){bg='#1f2937';label='TERMINÉ';sub='Bravo !';rem=tl.total;f=0;nx='Durée totale';nbg='#374151';}
   else{
@@ -761,10 +741,6 @@ function drawSet(){
     box('Voix',
       row('Annoncer les périodes',tog(S.voice,v=>{S.voice=v;saveS();if(v)speak('Exercice');}),'Préparation, exercice, repos, récupération'),
       el('div',{class:'hint'},'La voix ne fonctionne que lorsque l’écran est allumé et l’appli au premier plan. Si le mode silencieux de l’iPhone la coupe, les bips restent audibles.')),
-    box('Vibration',
-      row('Vibrer à chaque changement de période',tog(S.vibe,v=>{S.vibe=v;saveS();if(v)buzz('work');}),navigator.vibrate?'Vibration du téléphone':'iPhone : retour haptique de Safari'),
-      el('div',{class:'cr'},el('button',{class:'btn',onclick:()=>{const o=S.vibe;S.vibe=true;buzz('rest');buzz('work');S.vibe=o;}},'Tester la vibration')),
-      el('div',{class:'hint'},navigator.vibrate?'Fonctionne aussi écran verrouillé sur la plupart des téléphones Android uniquement si le navigateur le permet.':'Sur iPhone, iOS n’autorise pas les pages web à vibrer : on utilise le retour haptique de Safari, qui peut ne pas se déclencher (ou pas écran verrouillé). Les sons restent le signal fiable.')),
     box('Préparation',row('Durée avant le début',dur(S.prepTime,v=>{S.prepTime=v;saveS();rebuildIfIdle();}),'0 = démarrage immédiat')),
     box('Thème',themeChips,el('div',{class:'hint'},THEME_HINT[S.theme]||'')),
     box('Apparence du compte à rebours',chips),
@@ -774,7 +750,7 @@ function drawSet(){
       el('div',{class:'cr'},el('button',{class:'btn',onclick:exportData},'Exporter mes séances'),el('button',{class:'btn',onclick:()=>$('#imp').click()},'Importer')),
       el('input',{type:'file',id:'imp',accept:'.json,application/json',style:'display:none',onchange:importData}),
       el('div',{class:'hint'},'Conseillé de temps en temps : les données restent sur cet appareil.')),
-    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 12')
+    el('div',{class:'hint',style:'text-align:center'},'Fractio · version 13')
   );
 }
 function exportData(){
